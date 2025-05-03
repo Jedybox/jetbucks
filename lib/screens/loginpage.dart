@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 20),
                       filled: true,
-                      fillColor: const Color(0xFFF5F5F5), // softer gray
+                      fillColor: const Color(0xFFF5F5F5),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
@@ -136,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 20),
                       filled: true,
-                      fillColor: const Color(0xFFF5F5F5), // softer gray
+                      fillColor: const Color(0xFFF5F5F5),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
