@@ -14,6 +14,9 @@ class LoginPage extends StatefulWidget {
 
 /// This is the state class for the LoginPage widget.
 class _LoginPageState extends State<LoginPage> {
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
   bool isPasswordVisible = false;
 
   Future<void> checkConnectivity() async {
@@ -64,6 +67,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 10),
                   TextField(
+                    controller: usernameController,
                     style: GoogleFonts.quicksand(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
@@ -95,7 +99,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 10),
                   TextField(
-                    obscureText: true, // Optional: hides password input
+                    controller: passwordController,
+                    obscureText: isPasswordVisible,
                     style: GoogleFonts.quicksand(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
@@ -138,7 +143,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
                 ],
               ),
             ),
@@ -150,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                     // Handle login action
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 47, 17, 85),
+                    backgroundColor: const Color.fromARGB(255, 91, 37, 159),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -168,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

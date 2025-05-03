@@ -19,9 +19,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 47, 17, 85),
-          primary: const Color.fromARGB(255, 47, 17, 85),
-          secondary: const Color.fromARGB(255, 47, 17, 85),
+          seedColor: const Color.fromARGB(255, 91, 37, 159),
+          primary: const Color.fromARGB(255, 91, 37, 159),
+          secondary: const Color.fromARGB(255, 91, 37, 159),
+          tertiary: const Color.fromARGB(255, 91, 37, 159),
           surface: Colors.white,
         ),
         textTheme: GoogleFonts.rubikTextTheme(),
