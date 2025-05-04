@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:localstorage/localstorage.dart';
 
 import 'package:jetbucks/screens/homepage.dart';
 import 'package:jetbucks/screens/loginpage.dart';
 import 'package:jetbucks/screens/registerpage.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initLocalStorage();
+
   runApp(const MyApp());
 }
 

@@ -47,6 +47,9 @@ dependencies:
   # For API calls
   dio: ^5.8.0+1
 
+  # For caching
+  localstorage: ^6.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

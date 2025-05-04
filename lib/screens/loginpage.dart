@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:dio/dio.dart';
 
 import 'package:jetbucks/dialogs/nowifidialog.dart';
+import 'package:jetbucks/dialogs/loadingdialog.dart';
+import 'package:localstorage/localstorage.dart';
 
 /// This is the login page widget.
 class LoginPage extends StatefulWidget {
@@ -14,6 +17,7 @@ class LoginPage extends StatefulWidget {
 
 /// This is the state class for the LoginPage widget.
 class _LoginPageState extends State<LoginPage> {
+  bool _initialized = false;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -30,14 +34,83 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _validateForm() {
-    _formKey.currentState!.validate();
+  Future<void> _validateFormAndLogin() async {
+    final isValid = _formKey.currentState!.validate();
+
+    showDialog(
+      context: context,
+      builder: (context) => showLoadingDialog(context),
+    );
+
+    if (!isValid) {
+      Navigator.of(context).pop(); // Close loading dialog
+      return;
+    }
+
+    final username = usernameController.text;
+    final password = passwordController.text;
+
+    final dio = Dio();
+
+    dio
+        .get(
+          'https://jcash.onrender.com/api/v1/users/login',
+          queryParameters: {'username': username, 'password': password},
+        )
+        .then((response) {
+          if (response.statusCode == 202) {
+            // Save the username and password to local storage
+            localStorage.setItem('username', username);
+            localStorage.setItem('password', password);
+
+            Navigator.pushReplacementNamed(context, '/home');
+          } else {
+            // Handle error
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Login failed. Please try again.')),
+            );
+          }
+        })
+        .catchError((error) {
+          // Handle error
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('An error occurred: $error')));
+        });
+
+    Navigator.of(context).pop(); // Close loading dialog
   }
 
   @override
-  void initState() {
-    super.initState();
-    checkConnectivity();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_initialized) {
+      _initialized = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await checkConnectivity();
+
+        showDialog(
+          context: context,
+          builder: (context) => showLoadingDialog(context),
+        );
+
+        final username = localStorage.getItem('username');
+        final password = localStorage.getItem('password');
+
+        if (username == null && password == null) {
+          Navigator.of(context).pop(); // Close loading dialog
+          return;
+        }
+
+        Navigator.of(context).pop(); // Close dialog
+
+        Future.delayed(Duration(milliseconds: 100), () {
+          Navigator.pushReplacementNamed(context, '/home');
+        });
+      });
+    }
   }
 
   @override
@@ -168,7 +241,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: _validateForm,
+                  onPressed: _validateFormAndLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 91, 37, 159),
                     shape: RoundedRectangleBorder(
