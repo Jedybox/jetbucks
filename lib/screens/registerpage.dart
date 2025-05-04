@@ -1,55 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
-import 'package:jetbucks/dialogs/nowifidialog.dart';
-
-/// This is the login page widget.
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-/// This is the state class for the LoginPage widget.
-class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
+class _RegisterPageState extends State<RegisterPage> {
   bool isPasswordVisible = false;
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> checkConnectivity() async {
-    var connectivityResult = await Connectivity().checkConnectivity();
+  DateTime? _selectedDate;
+  String? _dobError;
 
-    // ignore: unrelated_type_equality_checks
-    if (connectivityResult == ConnectivityResult.none) {
-      // ignore: use_build_context_synchronously
-      showDialog(context: context, builder: (context) => const NoWifiDialog());
+  Future<void> _pickDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        _selectedDate = pickedDate;
+        _dobError = null;
+      });
     }
   }
 
-  void _validateForm() {
-    _formKey.currentState!.validate();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    checkConnectivity();
+  void _submitForm() {
+    final isValid = _formKey.currentState!.validate();
+    setState(() {
+      _dobError =
+          _selectedDate == null ? 'Please select your date of birth' : null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(automaticallyImplyLeading: false),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              'Welcome back\nto JetBucks Wallet',
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            const Text(
+              "Immediately feel the ease of transacting just by registering",
               style: TextStyle(
                 fontFamily: 'Rubik',
                 fontWeight: FontWeight.bold,
@@ -58,22 +61,23 @@ class _LoginPageState extends State<LoginPage> {
               ),
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 20),
             Form(
               key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Text(
-                    'Sign In',
-                    style: TextStyle(
-                      fontFamily: GoogleFonts.quicksand().fontFamily,
+                    'Register here',
+                    style: GoogleFonts.quicksand(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
-                      color: Color.fromARGB(255, 189, 189, 189),
+                      color: const Color.fromARGB(255, 189, 189, 189),
                     ),
                   ),
                   const SizedBox(height: 10),
                   TextFormField(
-                    controller: usernameController,
+                    controller: _usernameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your username';
@@ -110,8 +114,54 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 10),
+
+                  // DOB Picker
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _pickDate(context),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 0),
+                          backgroundColor: const Color(0xFFF5F5F5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 20,
+                            horizontal: 16,
+                          ),
+                          shadowColor: Colors.transparent,
+                          alignment: Alignment.centerLeft,
+                        ),
+                        child: Text(
+                          _selectedDate != null
+                              ? DateFormat('yMMMMd').format(_selectedDate!)
+                              : 'Select Date of Birth',
+                          style: GoogleFonts.quicksand(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ),
+                      if (_dobError != null)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12, top: 5),
+                          child: Text(
+                            _dobError!,
+                            style: TextStyle(
+                              color: Colors.red[700],
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
                   TextFormField(
-                    controller: passwordController,
+                    controller: _passwordController,
                     obscureText: isPasswordVisible,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -140,17 +190,18 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       suffixIcon: IconButton(
+                        icon:
+                            isPasswordVisible
+                                ? const Icon(Icons.visibility_off)
+                                : const Icon(Icons.visibility),
+                        color: Colors.grey[700],
                         onPressed: () {
                           setState(() {
                             isPasswordVisible = !isPasswordVisible;
                           });
                         },
-                        icon: Icon(
-                          isPasswordVisible
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: Colors.grey[600],
-                        ),
+                        splashColor: Colors.transparent, // Disable splash
+                        highlightColor: Colors.transparent,
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 20),
                       filled: true,
@@ -161,6 +212,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -168,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: _validateForm,
+                  onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 91, 37, 159),
                     shape: RoundedRectangleBorder(
@@ -180,7 +232,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   child: Text(
-                    'Login',
+                    'Register',
                     style: GoogleFonts.quicksand(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
@@ -193,7 +245,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Don\'t have an account?',
+                      'You have an account?',
                       style: GoogleFonts.quicksand(
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
@@ -203,10 +255,10 @@ class _LoginPageState extends State<LoginPage> {
                     TextButton(
                       onPressed: () {
                         // Navigate to the register page
-                        Navigator.pushReplacementNamed(context, '/register');
+                        Navigator.pushReplacementNamed(context, '/login');
                       },
                       child: Text(
-                        'Register',
+                        'Login',
                         style: GoogleFonts.quicksand(
                           fontWeight: FontWeight.w500,
                           fontSize: 14,

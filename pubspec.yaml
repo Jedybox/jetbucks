@@ -40,6 +40,12 @@ dependencies:
 
   # For connectivity checking
   connectivity_plus: ^6.1.4
+  
+  # For date formatting
+  intl: ^0.20.2
+
+  # For API calls
+  dio: ^5.8.0+1
 
 dev_dependencies:
   flutter_test:
