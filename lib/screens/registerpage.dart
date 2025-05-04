@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:dio/dio.dart';
+
+import 'package:jetbucks/dialogs/loadingdialog.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -35,16 +38,69 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _submitForm() {
     final isValid = _formKey.currentState!.validate();
+    bool isDateValid =
+        _selectedDate != null &&
+        DateTime.now().difference(_selectedDate!).inDays / 365 >= 18;
+
     setState(() {
-      _dobError =
-          _selectedDate == null ? 'Please select your date of birth' : null;
+      if (_selectedDate == null) {
+        _dobError = 'Please select your date of birth';
+      } else if (!isDateValid) {
+        _dobError = 'You must be at least 18 years old';
+      } else {
+        _dobError = null;
+      }
     });
+
+    if (!isDateValid) {
+      return;
+    }
+
+    if (isValid && _selectedDate != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return showLoadingDialog(context);
+        },
+      );
+
+      // Perform registration logic here
+      String username = _usernameController.text;
+      String password = _passwordController.text;
+
+      // Example API call using Dio
+      Dio dio = Dio();
+      dio
+          .post(
+            'https://jcash.onrender.com/api/v1/users/register',
+            data: {'username': username, 'password': password},
+          )
+          .then((response) {
+            if (response.statusCode == 201) {
+              // Handle successful registration
+              Navigator.pushReplacementNamed(context, '/home');
+            } else {
+              // Handle error response
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Registration failed')));
+            }
+          })
+          .catchError((error) {
+            // Handle network error
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Network error: $error')));
+          });
+
+      // Close the loading dialog
+      Navigator.of(context).pop(); // Close the loading dialog
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -61,18 +117,19 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
             Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Text(
-                    'Register here',
-                    style: GoogleFonts.quicksand(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: const Color.fromARGB(255, 189, 189, 189),
+                  Center(
+                    child: Text(
+                      'Register here',
+                      style: GoogleFonts.quicksand(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: const Color.fromARGB(255, 189, 189, 189),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
