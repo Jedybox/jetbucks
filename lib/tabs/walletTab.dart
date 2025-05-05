@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jetbucks/buttons/squarebutton.dart';
 
-Padding walletTab() {
+Padding walletTab({required TabController tabController}) {
   return Padding(
     padding: const EdgeInsets.fromLTRB(30, 50, 30, 0),
     child: Column(
@@ -36,12 +36,23 @@ Padding walletTab() {
                 ),
               ],
             ),
-            Image.asset(
-              'assets/logos/profile.png',
-              width: 35,
-              height: 35,
-              fit: BoxFit.cover,
-              alignment: Alignment.topRight,
+            Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 69, 25, 125),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: IconButton(
+                icon: Image.asset(
+                  "assets/logos/profile.png",
+                  width: 25,
+                  height: 25,
+                ),
+                onPressed: () {
+                  tabController.animateTo(3); // Navigate to Account Tab
+                },
+              ),
             ),
           ],
         ),
@@ -214,14 +225,20 @@ Padding walletTab() {
                 color: Color.fromARGB(255, 47, 17, 85),
               ),
             ),
-            Text(
-              "See All",
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: GoogleFonts.quicksand().fontFamily,
-                fontWeight: FontWeight.w600,
-                color: Color.fromARGB(225, 132, 56, 255),
+            TextButton(
+              child: Text(
+                "See All",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: GoogleFonts.quicksand().fontFamily,
+                  fontWeight: FontWeight.w600,
+                  color: Color.fromARGB(225, 132, 56, 255),
+                ),
               ),
+              onPressed: () {
+                // Handle "See All" button press
+                tabController.animateTo(2); // Navigate to Status Tab
+              },
             ),
           ],
         ),

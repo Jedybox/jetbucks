@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage>
         physics: const NeverScrollableScrollPhysics(),
         children: [
           // Wallet Page
-          walletTab(),
+          walletTab(tabController: _tabController),
           // Status Page
           Center(
             child: Text(
