@@ -19,7 +19,7 @@ Padding walletTab() {
                 Text(
                   "Wallet",
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 24,
                     fontFamily: 'Rubik',
                     fontWeight: FontWeight.w600,
                     color: Color.fromARGB(255, 47, 17, 85),
@@ -38,8 +38,8 @@ Padding walletTab() {
             ),
             Image.asset(
               'assets/logos/profile.png',
-              width: 30,
-              height: 30,
+              width: 35,
+              height: 35,
               fit: BoxFit.cover,
               alignment: Alignment.topRight,
             ),

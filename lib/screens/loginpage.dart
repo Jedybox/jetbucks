@@ -38,48 +38,43 @@ class _LoginPageState extends State<LoginPage> {
     print('Validating form...');
     final isValid = _formKey.currentState!.validate();
 
+    if (!isValid) return;
+
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => showLoadingDialog(context),
     );
-
-    if (!isValid) {
-      Navigator.of(context).pop(); // Close loading dialog
-      return;
-    }
 
     final username = usernameController.text;
     final password = passwordController.text;
 
     final dio = Dio();
 
-    dio
-        .get(
-          'https://jcash.onrender.com/api/v1/users/login',
-          queryParameters: {'username': username, 'password': password},
-        )
-        .then((response) {
-          if (response.statusCode == 202) {
-            // Save the username and password to local storage
-            localStorage.setItem('username', username);
-            localStorage.setItem('password', password);
+    try {
+      final response = await dio.get(
+        'https://jcash.onrender.com/api/v1/users/login',
+        queryParameters: {'username': username, 'password': password},
+      );
 
-            Navigator.pushReplacementNamed(context, '/home');
-          } else {
-            // Handle error
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Login failed. Please try again.')),
-            );
-          }
-        })
-        .catchError((error) {
-          // Handle error
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('An error occurred: $error')));
-        });
+      Navigator.of(context).pop(); // Close loading dialog
 
-    Navigator.of(context).pop(); // Close loading dialog
+      if (response.statusCode == 202) {
+        localStorage.setItem('username', username);
+        localStorage.setItem('password', password);
+
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed. Please try again.')),
+        );
+      }
+    } catch (error) {
+      Navigator.of(context).pop(); // Close loading dialog
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('An error occurred: $error')));
+    }
   }
 
   @override

@@ -45,7 +45,7 @@ Padding accountTab({required BuildContext context}) {
                       fontSize: 22,
                       fontFamily: GoogleFonts.quicksand().fontFamily,
                       fontWeight: FontWeight.w600,
-                      color: Color.fromARGB(255, 47, 17, 85),
+                      color: Colors.grey[600],
                     ),
                   ),
                   Text(
@@ -54,7 +54,7 @@ Padding accountTab({required BuildContext context}) {
                       fontSize: 22,
                       fontFamily: GoogleFonts.quicksand().fontFamily,
                       fontWeight: FontWeight.w600,
-                      color: Color.fromARGB(255, 47, 17, 85),
+                      color: Colors.grey[600],
                     ),
                   ),
                 ],
