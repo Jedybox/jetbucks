@@ -10,7 +10,7 @@
 - TODO: Develop Cash In Page
 - TODO: Develop Cash Out Page
 - TODO: Develop Send Money Page
-- TODO: Develop Account page with Log-out button
+- ~~TODO: Develop Account page with Log-out button~~
 
 ## API imlementations
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:jetbucks/tabs/walletTab.dart';
+import 'package:jetbucks/tabs/accountTab.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -58,16 +59,7 @@ class _HomePageState extends State<HomePage>
             ),
           ),
           // Account Page
-          Center(
-            child: Text(
-              "Account",
-              style: GoogleFonts.poppins(
-                fontSize: 30,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ),
+          accountTab(context: context),
         ],
       ),
       bottomNavigationBar: Container(

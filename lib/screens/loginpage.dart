@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  bool isPasswordVisible = false;
+  bool _passwordIsNotVisible = true;
 
   Future<void> checkConnectivity() async {
     var connectivityResult = await Connectivity().checkConnectivity();
@@ -35,6 +35,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _validateFormAndLogin() async {
+    print('Validating form...');
     final isValid = _formKey.currentState!.validate();
 
     showDialog(
@@ -99,7 +100,8 @@ class _LoginPageState extends State<LoginPage> {
         final username = localStorage.getItem('username');
         final password = localStorage.getItem('password');
 
-        if (username == null && password == null) {
+        if ((username == null && password == null) ||
+            (username == '' && password == '')) {
           Navigator.of(context).pop(); // Close loading dialog
           return;
         }
@@ -185,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 10),
                   TextFormField(
                     controller: passwordController,
-                    obscureText: isPasswordVisible,
+                    obscureText: _passwordIsNotVisible,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your password';
@@ -215,11 +217,11 @@ class _LoginPageState extends State<LoginPage> {
                       suffixIcon: IconButton(
                         onPressed: () {
                           setState(() {
-                            isPasswordVisible = !isPasswordVisible;
+                            _passwordIsNotVisible = !_passwordIsNotVisible;
                           });
                         },
                         icon: Icon(
-                          isPasswordVisible
+                          _passwordIsNotVisible
                               ? Icons.visibility_off
                               : Icons.visibility,
                           color: Colors.grey[600],
