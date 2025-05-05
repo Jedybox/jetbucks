@@ -14,4 +14,5 @@
 
 ## API imlementations
 
-- TODO: implement wallet tab API
+- ~~TODO: implement wallet tab API~~
+- TODO: implement transaction record API

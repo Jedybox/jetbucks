@@ -35,7 +35,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _validateFormAndLogin() async {
-    print('Validating form...');
     final isValid = _formKey.currentState!.validate();
 
     if (!isValid) return;

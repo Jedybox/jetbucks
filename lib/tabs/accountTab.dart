@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:localstorage/localstorage.dart';
 
-Padding accountTab({required BuildContext context}) {
+Padding accountTab({required BuildContext context, required double balance}) {
   return Padding(
     padding: const EdgeInsets.fromLTRB(30, 50, 30, 0),
     child: Column(
@@ -24,7 +24,7 @@ Padding accountTab({required BuildContext context}) {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      "User Name",
+                      localStorage.getItem('username') ?? 'User',
                       style: TextStyle(
                         fontSize: 22,
                         fontFamily: 'Rubik',
@@ -48,13 +48,26 @@ Padding accountTab({required BuildContext context}) {
                       color: Colors.grey[600],
                     ),
                   ),
-                  Text(
-                    "\$1000",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontFamily: GoogleFonts.quicksand().fontFamily,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[600],
+                  Text.rich(
+                    TextSpan(
+                      text: "₱",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontFamily: GoogleFonts.quicksand().fontFamily,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[600],
+                      ),
+                      children: [
+                        TextSpan(
+                          text: balance.toStringAsFixed(2),
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontFamily: GoogleFonts.quicksand().fontFamily,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jetbucks/buttons/squarebutton.dart';
 
-Padding walletTab({required TabController tabController}) {
+Padding walletTab({
+  required TabController tabController,
+  required double balance,
+}) {
   return Padding(
     padding: const EdgeInsets.fromLTRB(30, 50, 30, 0),
     child: Column(
@@ -95,13 +98,26 @@ Padding walletTab({required TabController tabController}) {
                           ),
                         ),
                         SizedBox(height: 6),
-                        Text(
-                          "\$ 1.234",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: GoogleFonts.rubik().fontFamily,
+                        Text.rich(
+                          TextSpan(
+                            text: "₱",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: GoogleFonts.quicksand().fontFamily,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: balance.toStringAsFixed(2),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: GoogleFonts.rubik().fontFamily,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],

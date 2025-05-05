@@ -1,8 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:dio/dio.dart';
+import 'package:localstorage/localstorage.dart';
 
 import 'package:jetbucks/tabs/walletTab.dart';
 import 'package:jetbucks/tabs/accountTab.dart';
+import 'package:jetbucks/dialogs/loadingdialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,11 +18,98 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool userLoggedIn = false;
+
+  double balance = 0.00;
+  int userId = 0;
+
+  Future<void> _getUserData() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing manually
+      builder: (BuildContext context) => showLoadingDialog(context),
+    );
+
+    final username = localStorage.getItem('username');
+    final password = localStorage.getItem('password');
+
+    Dio dio = Dio();
+
+    try {
+      final response1 = await dio.get(
+        'https://jcash.onrender.com/api/v1/users/login',
+        queryParameters: {'username': username, 'password': password},
+      );
+
+      print(response1.data);
+
+      // Close loading dialog after success
+      Navigator.of(context).pop();
+
+      if (response1.statusCode == 202) {
+        final data = response1.data;
+        setState(() {
+          balance = data['currentMoney'] ?? 0.00;
+          userId = data['id'] ?? 0;
+        });
+        if (kDebugMode) {
+          print(data.runtimeType);
+        }
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to fetch data",
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      // Show connection error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Connection error",
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!userLoggedIn) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _getUserData().then((_) {
+          setState(() {
+            userLoggedIn = true;
+          });
+        });
+      });
+    }
   }
 
   @override
@@ -35,7 +126,7 @@ class _HomePageState extends State<HomePage>
         physics: const NeverScrollableScrollPhysics(),
         children: [
           // Wallet Page
-          walletTab(tabController: _tabController),
+          walletTab(tabController: _tabController, balance: balance),
           // Status Page
           Center(
             child: Text(
@@ -59,7 +150,7 @@ class _HomePageState extends State<HomePage>
             ),
           ),
           // Account Page
-          accountTab(context: context),
+          accountTab(context: context, balance: balance),
         ],
       ),
       bottomNavigationBar: Container(
