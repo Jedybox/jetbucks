@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:jetbucks/providers/User.dart';
 import 'package:jetbucks/buttons/squarebutton.dart';
+import 'package:jetbucks/screens/transactionpage.dart';
 
 String formatTitle(String title, Map<String, dynamic> transaction, int userID) {
   if (title != 'SEND') return title;
@@ -207,7 +208,13 @@ class _WalletTabState extends State<WalletTab> {
                       width: 25,
                       height: 25,
                     ),
-                    onPressed: () {},
+                    onPressed:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TransactionPage(type: 'SEND'),
+                          ),
+                        ),
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -230,7 +237,14 @@ class _WalletTabState extends State<WalletTab> {
                       width: 25,
                       height: 25,
                     ),
-                    onPressed: () {},
+                    onPressed:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => TransactionPage(type: 'CASH-IN'),
+                          ),
+                        ),
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -253,7 +267,14 @@ class _WalletTabState extends State<WalletTab> {
                       width: 25,
                       height: 25,
                     ),
-                    onPressed: () {},
+                    onPressed:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => TransactionPage(type: 'CASH-OUT'),
+                          ),
+                        ),
                   ),
                   const SizedBox(height: 10),
                   Text(
