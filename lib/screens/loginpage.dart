@@ -61,6 +61,7 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 202) {
         localStorage.setItem('username', username);
         localStorage.setItem('password', password);
+        localStorage.setItem('id', response.data['id'].toString());
 
         Navigator.pushReplacementNamed(context, '/home');
       } else {

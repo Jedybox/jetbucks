@@ -49,7 +49,7 @@ class _NotifTabState extends State<NotifTab> {
               itemCount: Provider.of<UserProvider>(context).transactions.length,
               itemBuilder: (context, index) {
                 final transaction =
-                    Provider.of<UserProvider>(context).transactions[index];
+                    context.watch<UserProvider>().transactions[index];
 
                 String title = transaction['transaction_type'];
                 DateTime dateTime = DateTime.parse(

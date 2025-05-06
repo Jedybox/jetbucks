@@ -62,10 +62,10 @@ Padding accountTab({required BuildContext context, required double balance}) {
                       ),
                       children: [
                         TextSpan(
-                          text:
-                              Provider.of<UserProvider>(
-                                context,
-                              ).balance.toString(),
+                          text: context
+                              .watch<UserProvider>()
+                              .balance
+                              .toStringAsFixed(2),
                           style: TextStyle(
                             fontSize: 22,
                             fontFamily: GoogleFonts.quicksand().fontFamily,

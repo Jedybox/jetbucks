@@ -150,7 +150,7 @@ class _WalletTabState extends State<WalletTab> {
                               children: [
                                 TextSpan(
                                   text:
-                                      "${Provider.of<UserProvider>(context).balance.toStringAsFixed(2)}",
+                                      "${context.watch<UserProvider>().balance.toStringAsFixed(2)}",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 24,
@@ -303,12 +303,12 @@ class _WalletTabState extends State<WalletTab> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount:
-                Provider.of<UserProvider>(context).transactions.length > 3
+                context.watch<UserProvider>().transactions.length > 3
                     ? 3
-                    : Provider.of<UserProvider>(context).transactions.length,
+                    : context.watch<UserProvider>().transactions.length,
             itemBuilder: (context, index) {
               final transaction =
-                  Provider.of<UserProvider>(context).transactions[index];
+                  context.watch<UserProvider>().transactions[index];
 
               String title = transaction['transaction_type'];
               DateTime dateTime = DateTime.parse(
@@ -322,7 +322,7 @@ class _WalletTabState extends State<WalletTab> {
                 title = formatTitle(
                   title,
                   transaction,
-                  Provider.of<UserProvider>(context).userId,
+                  context.read<UserProvider>().userId,
                 );
               }
 
@@ -331,7 +331,7 @@ class _WalletTabState extends State<WalletTab> {
                   formatTitle(
                     transaction['transaction_type'],
                     transaction,
-                    Provider.of<UserProvider>(context).userId,
+                    context.read<UserProvider>().userId,
                   ),
                   style: TextStyle(
                     fontSize: 16,

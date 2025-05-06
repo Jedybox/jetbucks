@@ -53,6 +53,9 @@ dependencies:
   # For state management
   provider: ^6.1.5
 
+  # For charting
+  fl_chart: ^0.71.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

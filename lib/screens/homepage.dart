@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:jetbucks/tabs/walletTab.dart'; // Ensure this file defines a class named Wallettab
 import 'package:jetbucks/tabs/accountTab.dart';
 import 'package:jetbucks/tabs/notifTab.dart';
+import 'package:jetbucks/tabs/chartTab.dart';
 import 'package:jetbucks/dialogs/loadingdialog.dart';
 import 'package:jetbucks/providers/User.dart';
 
@@ -69,16 +70,7 @@ class _HomePageState extends State<HomePage>
           // Wallet Page
           WalletTab(tabController: _tabController),
           // Status Page
-          Center(
-            child: Text(
-              "Status",
-              style: GoogleFonts.poppins(
-                fontSize: 30,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ),
+          ChartTab(),
           // Notification Page
           NotifTab(userID: userId),
           // Account Page

@@ -148,7 +148,10 @@ class RecieptPage extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          transaction['receiver'].toString(),
+                          transaction['receiver'] ==
+                                  context.read<UserProvider>().userId
+                              ? 'You'
+                              : transaction['receiver'].toString(),
                           style: GoogleFonts.rubik(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -171,7 +174,10 @@ class RecieptPage extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          transaction['sender'].toString(),
+                          transaction['sender'] ==
+                                  context.read<UserProvider>().userId
+                              ? 'You'
+                              : transaction['sender'].toString(),
                           style: GoogleFonts.rubik(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
