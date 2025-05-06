@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:jetbucks/providers/User.dart';
 import 'package:jetbucks/tabs/walletTab.dart';
+import 'package:jetbucks/screens/recieptpage.dart';
 
 class NotifTab extends StatefulWidget {
   final int userID;
@@ -65,36 +66,58 @@ class _NotifTabState extends State<NotifTab> {
                   );
                 }
 
-                return Card(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  shadowColor: Color.fromARGB(255, 47, 17, 85),
-                  child: ListTile(
-                    title: Text(
-                      title,
-                      style: TextStyle(color: Color.fromARGB(255, 54, 56, 83)),
-                    ),
-                    subtitle: Text(
-                      formattedDate,
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 189, 189, 189),
-                        fontFamily: GoogleFonts.quicksand().fontFamily,
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  RecieptPage(transaction: transaction),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(0),
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
+                      elevation: 5,
+                      shadowColor: const Color.fromARGB(255, 47, 17, 85),
                     ),
-                    trailing:
-                        isIncome(title)
-                            ? Image.asset(
-                              'assets/logos/up.png',
-                              height: 30,
-                              width: 30,
-                            )
-                            : Image.asset(
-                              'assets/logos/down.png',
-                              height: 30,
-                              width: 30,
-                            ),
+                    child: ListTile(
+                      title: Text(
+                        formatTitle(title, transaction, userID),
+                        style: GoogleFonts.quicksand(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: const Color.fromARGB(255, 54, 56, 83),
+                        ),
+                      ),
+                      subtitle: Text(
+                        formattedDate,
+                        style: GoogleFonts.quicksand(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      trailing:
+                          isIncome(formatTitle(title, transaction, userID))
+                              ? Image.asset(
+                                'assets/logos/up.png',
+                                width: 30,
+                                height: 30,
+                              )
+                              : Image.asset(
+                                'assets/logos/down.png',
+                                width: 30,
+                                height: 30,
+                              ),
+                    ),
                   ),
                 );
               },
