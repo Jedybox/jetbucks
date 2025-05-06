@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:jetbucks/providers/User.dart';
+import 'package:jetbucks/dialogs/loadingdialog.dart';
+import 'package:dio/dio.dart';
 
 class TransactionPage extends StatefulWidget {
   final String type;
@@ -12,6 +16,7 @@ class TransactionPage extends StatefulWidget {
 
 class _TransactionPageState extends State<TransactionPage> {
   final TextEditingController usernameController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   final String type;
 
   String amount = '0.00';
@@ -22,6 +27,125 @@ class _TransactionPageState extends State<TransactionPage> {
     ['7', '8', '9'],
     ['00', '0', 'DEL'],
   ];
+
+  AlertDialog dialog(String title, String discrption) {
+    return AlertDialog(
+      title: Text(title),
+      content: Text(discrption),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> userExists(String username) async {
+    final dio = Dio();
+    final response = await dio.get(
+      'https://jcash.onrender.com/api/v1/users/search',
+      queryParameters: {'username': username},
+    );
+
+    if (response.statusCode == 200) {
+      return;
+    }
+
+    throw Exception('User not found');
+  }
+
+  // TODO: TEST THIS FUNCTION
+  void sendForm() {
+    if (type == 'SEND' && !_formKey.currentState!.validate()) return;
+
+    final userProvider = Provider.of<UserProvider>(context, listen: true);
+    final double parsedAmount = double.parse(amount.replaceAll('.', ''));
+
+    if (parsedAmount == 0.00) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => dialog('Invalid Amount', 'Please enter a valid amount.'),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => showLoadingDialog(context),
+    );
+
+    if (type == 'SEND') {
+      userExists(usernameController.text).catchError((_) {
+        Navigator.of(context).pop(); // Close the loading dialog
+        showDialog(
+          context: context,
+          builder:
+              (_) => dialog('User Not Found', 'Please enter a valid username.'),
+        );
+        return;
+      });
+
+      userProvider
+          .sendMoney(parsedAmount, usernameController.text)
+          .then((_) {
+            Navigator.of(context).pop(); // Close the loading dialog
+            // TODO: pop and push to reciept page
+          })
+          .catchError((_) {
+            Navigator.of(context).pop(); // Close the loading dialog
+            showDialog(
+              context: context,
+              builder:
+                  (_) => dialog(
+                    'Transaction Failed',
+                    'Please check your internet connection and try again.',
+                  ),
+            );
+          });
+    }
+
+    if (type == 'CASH-IN') {
+      userProvider
+          .cashIn(parsedAmount)
+          .then((_) {
+            Navigator.of(context).pop(); // Close the loading dialog
+            // TODO: pop and push to reciept page
+          })
+          .catchError((_) {
+            Navigator.of(context).pop(); // Close the loading dialog
+            showDialog(
+              context: context,
+              builder:
+                  (_) => dialog(
+                    'Transaction Failed',
+                    'Please check your internet connection and try again.',
+                  ),
+            );
+          });
+    }
+
+    if (type == 'CASH-OUT') {
+      userProvider
+          .cashOut(parsedAmount)
+          .then((_) {
+            Navigator.of(context).pop(); // Close the loading dialog
+            // TODO: pop and push to reciept page
+          })
+          .catchError((_) {
+            Navigator.of(context).pop(); // Close the loading dialog
+            showDialog(
+              context: context,
+              builder:
+                  (_) => dialog(
+                    'Transaction Failed',
+                    'Please check your internet connection and try again.',
+                  ),
+            );
+          });
+    }
+  }
 
   void _onKeyPress(String key) {
     setState(() {
@@ -135,40 +259,43 @@ class _TransactionPageState extends State<TransactionPage> {
             if (type == 'SEND')
               Padding(
                 padding: const EdgeInsets.only(top: 20.0, right: 60, left: 60),
-                child: TextFormField(
-                  controller: usernameController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a username';
-                    }
-                    return null;
-                  },
-                  style: GoogleFonts.quicksand(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                    color: Colors.black,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: "Username",
-                    hintStyle: GoogleFonts.quicksand(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 15,
-                      color: Colors.grey[600],
+                child: Form(
+                  key: _formKey,
+                  child: TextFormField(
+                    controller: usernameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a username';
+                      }
+                      return null;
+                    },
+                    style: GoogleFonts.quicksand(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Colors.black,
                     ),
-                    prefixIcon: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Image.asset(
-                        'assets/logos/profile.png',
-                        width: 22,
-                        height: 22,
+                    decoration: InputDecoration(
+                      hintText: "Username",
+                      hintStyle: GoogleFonts.quicksand(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                        color: Colors.grey[600],
                       ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
-                    filled: true,
-                    fillColor: const Color(0xFFF5F5F5),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
+                      prefixIcon: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Image.asset(
+                          'assets/logos/profile.png',
+                          width: 22,
+                          height: 22,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 20),
+                      filled: true,
+                      fillColor: const Color(0xFFF5F5F5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                 ),
@@ -223,7 +350,7 @@ class _TransactionPageState extends State<TransactionPage> {
             ),
             const SizedBox(height: 30),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: sendForm,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,

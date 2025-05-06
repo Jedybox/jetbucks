@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
 
 class UserProvider with ChangeNotifier {
@@ -57,48 +58,116 @@ class UserProvider with ChangeNotifier {
     if (response1.statusCode == 200) {
       _transactions =
           List<Map<String, dynamic>>.from(response1.data).reversed.toList();
-
-      _recent7daysTransactions =
-          _transactions.where((transaction) {
-            DateTime transactionDate = DateTime.parse(
-              transaction['transaction_date'],
-            );
-            DateTime now = DateTime.now();
-            Duration difference = now.difference(transactionDate);
-            return difference.inDays <= 7;
-          }).toList();
-
-      _recent4WeeksTransactions =
-          _transactions.where((transaction) {
-            DateTime transactionDate = DateTime.parse(
-              transaction['transaction_date'],
-            );
-            DateTime now = DateTime.now();
-            Duration difference = now.difference(transactionDate);
-            return difference.inDays <= 28;
-          }).toList();
-
-      _recent6MonthsTransactions =
-          _transactions.where((transaction) {
-            DateTime transactionDate = DateTime.parse(
-              transaction['transaction_date'],
-            );
-            DateTime now = DateTime.now();
-            Duration difference = now.difference(transactionDate);
-            return difference.inDays <= 180;
-          }).toList();
-
-      _recent1YearTransactions =
-          _transactions.where((transaction) {
-            DateTime transactionDate = DateTime.parse(
-              transaction['transaction_date'],
-            );
-            DateTime now = DateTime.now();
-            Duration difference = now.difference(transactionDate);
-            return difference.inDays <= 365;
-          }).toList();
     }
 
     notifyListeners();
+  }
+
+  void distributeTransactions() {
+    _recent7daysTransactions =
+        _transactions
+            .where(
+              (transaction) => DateTime.parse(
+                transaction['date'],
+              ).isAfter(DateTime.now().subtract(Duration(days: 7))),
+            )
+            .toList();
+
+    _recent4WeeksTransactions =
+        _transactions
+            .where(
+              (transaction) => DateTime.parse(
+                transaction['date'],
+              ).isAfter(DateTime.now().subtract(Duration(days: 28))),
+            )
+            .toList();
+
+    _recent6MonthsTransactions =
+        _transactions
+            .where(
+              (transaction) => DateTime.parse(
+                transaction['date'],
+              ).isAfter(DateTime.now().subtract(Duration(days: 180))),
+            )
+            .toList();
+
+    _recent1YearTransactions =
+        _transactions
+            .where(
+              (transaction) => DateTime.parse(
+                transaction['date'],
+              ).isAfter(DateTime.now().subtract(Duration(days: 365))),
+            )
+            .toList();
+  }
+
+  Future<void> cashIn(double amount) async {
+    Dio dio = Dio();
+    final response = await dio.post(
+      'https://jcash.onrender.com/api/v1/transactions/cashIn',
+      data: {
+        'transaction_type': 'CASH-IN',
+        'amount': amount,
+        "receiver": _userId,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      _balance += amount;
+      refreshUserData().catchError((_) {
+        throw Exception('Failed to refresh user data after cash in');
+      });
+      notifyListeners();
+      return;
+    }
+
+    throw Exception('Failed to cash in');
+  }
+
+  Future<void> cashOut(double amount) async {
+    Dio dio = Dio();
+    final response = await dio.post(
+      'https://jcash.onrender.com/api/v1/transactions/cashOut',
+      data: {
+        'transaction_type': 'CASH-OUT',
+        'amount': amount,
+        "receiver": _userId,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      _balance -= amount;
+      refreshUserData().catchError((_) {
+        throw Exception('Failed to refresh user data after cash out');
+      });
+      notifyListeners();
+      return;
+    }
+
+    throw Exception('Failed to cash out');
+  }
+
+  Future<void> sendMoney(double amount, String receiverId) async {
+    Dio dio = Dio();
+    final response = await dio.post(
+      'https://jcash.onrender.com/api/v1/transactions/send-money',
+      data: {
+        'transaction_type': 'SEND',
+        'amount': amount,
+        "receiver": receiverId,
+        "sender": _userId,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      _balance -= amount;
+      refreshUserData().catchError((_) {
+        throw Exception('Failed to refresh user data after sending money');
+      });
+      notifyListeners();
+      return;
+    }
+
+    throw Exception('Failed to send money');
   }
 }
