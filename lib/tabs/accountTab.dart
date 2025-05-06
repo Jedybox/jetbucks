@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:provider/provider.dart';
+
+import 'package:jetbucks/providers/User.dart';
 
 Padding accountTab({required BuildContext context, required double balance}) {
   return Padding(
@@ -59,7 +62,10 @@ Padding accountTab({required BuildContext context, required double balance}) {
                       ),
                       children: [
                         TextSpan(
-                          text: balance.toStringAsFixed(2),
+                          text:
+                              Provider.of<UserProvider>(
+                                context,
+                              ).balance.toString(),
                           style: TextStyle(
                             fontSize: 22,
                             fontFamily: GoogleFonts.quicksand().fontFamily,
@@ -75,35 +81,44 @@ Padding accountTab({required BuildContext context, required double balance}) {
             ],
           ),
         ),
-        OutlinedButton(
-          onPressed: () {
-            // Handle button press
-            localStorage.setItem('username', '');
-            localStorage.setItem('password', '');
+        Column(
+          children: [
+            OutlinedButton(
+              onPressed: () {
+                // Handle button press
+                localStorage.setItem('username', '');
+                localStorage.setItem('password', '');
 
-            Navigator.pushReplacementNamed(context, '/login');
-          },
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(
-              color: Color.fromARGB(255, 199, 103, 103),
-              width: 2,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            backgroundColor: Colors.white,
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: Color.fromARGB(255, 199, 103, 103),
+                  width: 2,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                backgroundColor: Colors.white,
 
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-          ),
-          child: Text(
-            "Log out",
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: GoogleFonts.quicksand().fontFamily,
-              fontWeight: FontWeight.w600,
-              color: Color.fromARGB(255, 199, 103, 103),
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+              ),
+              child: Icon(
+                Icons.logout_outlined,
+                color: Color.fromARGB(255, 199, 103, 103),
+                size: 30,
+              ),
             ),
-          ),
+            Text(
+              "Logout",
+              style: TextStyle(
+                fontSize: 20,
+                fontFamily: GoogleFonts.quicksand().fontFamily,
+                fontWeight: FontWeight.w600,
+                color: Color.fromARGB(255, 199, 103, 103),
+              ),
+            ),
+          ],
         ),
       ],
     ),

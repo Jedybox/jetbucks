@@ -13,7 +13,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  bool isPasswordVisible = false;
+  bool isPasswordNotVisible = true;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -78,7 +78,10 @@ class _RegisterPageState extends State<RegisterPage> {
           .then((response) {
             if (response.statusCode == 201) {
               // Handle successful registration
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, '/login');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Registration successful')),
+              );
             } else {
               // Handle error response
               ScaffoldMessenger.of(
@@ -90,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
             // Handle network error
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text('Network error: $error')));
+            ).showSnackBar(SnackBar(content: Text('Registration failed')));
           });
 
       // Close the loading dialog
@@ -219,7 +222,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 10),
                   TextFormField(
                     controller: _passwordController,
-                    obscureText: isPasswordVisible,
+                    obscureText: isPasswordNotVisible,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your password';
@@ -248,13 +251,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       suffixIcon: IconButton(
                         icon:
-                            isPasswordVisible
+                            isPasswordNotVisible
                                 ? const Icon(Icons.visibility_off)
                                 : const Icon(Icons.visibility),
                         color: Colors.grey[700],
                         onPressed: () {
                           setState(() {
-                            isPasswordVisible = !isPasswordVisible;
+                            isPasswordNotVisible = !isPasswordNotVisible;
                           });
                         },
                         splashColor: Colors.transparent, // Disable splash

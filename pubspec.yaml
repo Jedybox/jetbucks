@@ -50,6 +50,9 @@ dependencies:
   # For caching
   localstorage: ^6.0.0
 
+  # For state management
+  provider: ^6.1.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -83,6 +86,8 @@ flutter:
     - assets/logos/status.png
     - assets/logos/wallet.png
     - assets/logos/account.png
+    - assets/logos/up.png
+    - assets/logos/down.png
     - assets/balancebg.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
