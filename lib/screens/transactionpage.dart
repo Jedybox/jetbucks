@@ -60,11 +60,11 @@ class _TransactionPageState extends State<TransactionPage> {
   }
 
   // TODO: TEST THIS FUNCTION
-  void sendForm() {
+  Future<void> sendForm() async {
     if (type == 'SEND' && !_formKey.currentState!.validate()) return;
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final double parsedAmount = double.parse(amount);
+    final double parsedAmount = double.tryParse(amount) ?? 0.00;
 
     if (parsedAmount <= 0.00) {
       showDialog(
@@ -77,94 +77,62 @@ class _TransactionPageState extends State<TransactionPage> {
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => showLoadingDialog(context),
     );
 
-    if (type == 'SEND') {
-      userExists(usernameController.text)
-          .then((_) {
-            Navigator.of(context).pop();
-            if (receiverId == userProvider.userId) {
-              Navigator.of(context).pop(); // Close the loading dialog
-              showDialog(
-                context: context,
-                builder:
-                    (_) => dialog(
-                      'Invalid User',
-                      'You cannot send money to yourself.',
-                    ),
-              );
-              return;
-            }
+    try {
+      if (type == 'SEND') {
+        await userExists(usernameController.text);
 
-            userProvider
-                .sendMoney(parsedAmount, receiverId)
-                .then((_) {
-                  Navigator.of(context).pop(); // Go back to the previous page
-                })
-                .catchError((_) {
-                  showDialog(
-                    context: context,
-                    builder:
-                        (_) => dialog(
-                          'Transaction Failed',
-                          'Please check your internet connection and try again.',
-                        ),
-                  );
-                });
-          })
-          .catchError((_) {
-            Navigator.of(context).pop(); // Close the loading dialog
-            showDialog(
-              context: context,
-              builder:
-                  (_) => dialog(
-                    'User Not Found',
-                    'Please enter your receiver\'s username.',
-                  ),
-            );
-          });
-      return;
-    }
+        if (receiverId == userProvider.userId) {
+          Navigator.of(context).pop(); // Close loading dialog
+          showDialog(
+            context: context,
+            builder:
+                (_) => dialog(
+                  'Invalid User',
+                  'You cannot send money to yourself.',
+                ),
+          );
+          return;
+        }
 
-    if (type == 'CASH-IN') {
-      userProvider
-          .cashIn(parsedAmount)
-          .then((_) {
-            Navigator.of(context).pop();
-          })
-          .catchError((_) {
-            Navigator.of(context).pop(); // Close the loading dialog
-            showDialog(
-              context: context,
-              builder:
-                  (_) => dialog(
-                    'Transaction Failed',
-                    'Please check your internet connection and try again.',
-                  ),
-            );
-          });
-      return;
-    }
+        await userProvider.sendMoney(parsedAmount, receiverId);
+      } else if (type == 'CASH-IN') {
+        await userProvider.cashIn(parsedAmount);
+      } else if (type == 'CASH-OUT') {
+        await userProvider.cashOut(parsedAmount);
+      }
 
-    if (type == 'CASH-OUT') {
-      userProvider
-          .cashOut(parsedAmount)
-          .then((_) {
-            Navigator.of(context).pop();
-          })
-          .catchError((_) {
-            Navigator.of(context).pop(); // Close the loading dialog
-            showDialog(
-              context: context,
-              builder:
-                  (_) => dialog(
-                    'Transaction Failed',
-                    'Please check your internet connection and try again.',
-                  ),
-            );
-          });
-      return;
+      Navigator.of(context).pop(); // Close loading dialog
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: Text('Transaction Successful'),
+              content: Text('You have successfully completed the transaction.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+      );
+    } catch (e) {
+      Navigator.of(context).pop(); // Close loading dialog
+      String errorMsg = 'Please check your internet connection and try again.';
+      if (type == 'SEND' && e.toString().contains('User not found')) {
+        errorMsg = 'Please enter your receiver\'s username.';
+      }
+      showDialog(
+        context: context,
+        builder: (_) => dialog('Transaction Failed', errorMsg),
+      );
     }
   }
 
