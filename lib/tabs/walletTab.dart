@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jetbucks/dialogs/loadingdialog.dart';
 import 'package:provider/provider.dart';
 
 import 'package:jetbucks/providers/User.dart';
@@ -88,13 +89,38 @@ class _WalletTabState extends State<WalletTab> {
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: IconButton(
-                  icon: Image.asset(
-                    "assets/logos/profile.png",
-                    width: 25,
-                    height: 25,
-                  ),
+                  icon: Icon(Icons.restart_alt, color: Colors.white, size: 25),
                   onPressed: () {
-                    tabController.animateTo(3); // Navigate to Account Tab
+                    showDialog(
+                      context: context,
+                      builder: (context) => showLoadingDialog(context),
+                    );
+
+                    context
+                        .read<UserProvider>()
+                        .refreshUserData()
+                        .then((_) {
+                          Navigator.of(
+                            context,
+                          ).pop(); // Close the loading dialog
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Wallet refreshed successfully!"),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        })
+                        .catchError((error) {
+                          Navigator.of(
+                            context,
+                          ).pop(); // Close the loading dialog
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Failed to refresh wallet."),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        });
                   },
                 ),
               ),
