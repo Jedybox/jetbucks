@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
 
 import 'package:jetbucks/providers/User.dart';
 import 'package:jetbucks/tabs/walletTab.dart';
 import 'package:jetbucks/screens/recieptpage.dart';
+import 'package:jetbucks/dialogs/loadingdialog.dart';
 
 class NotifTab extends StatefulWidget {
   final int userID;
@@ -17,6 +19,20 @@ class NotifTab extends StatefulWidget {
 
 class _NotifTabState extends State<NotifTab> {
   final int userID;
+
+  Future<String> userName(int id) async {
+    final dio = Dio();
+    final response = await dio.get(
+      'https://jcash.onrender.com/api/v1/users/search-name',
+      queryParameters: {'id': id},
+    );
+
+    if (response.statusCode == 200) {
+      return response.data;
+    }
+
+    throw Exception('Failed to load user name');
+  }
 
   _NotifTabState({required this.userID});
 
@@ -70,14 +86,87 @@ class _NotifTabState extends State<NotifTab> {
                   padding: const EdgeInsets.only(bottom: 20),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  RecieptPage(transaction: transaction),
-                        ),
-                      );
+                      if (transaction['transaction_type'] != 'SEND') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    RecieptPage(transaction: transaction),
+                          ),
+                        );
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (context) => showLoadingDialog(context),
+                        );
+
+                        userName(transaction['sender'])
+                            .then((name) {
+                              final sender = name;
+
+                              userName(transaction['receiver'])
+                                  .then((name) {
+                                    final receiver = name;
+
+                                    Navigator.pop(context);
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => RecieptPage(
+                                              transaction: transaction,
+                                              recipientName: receiver,
+                                              senderName: sender,
+                                            ),
+                                      ),
+                                    );
+                                  })
+                                  .catchError((error) {
+                                    Navigator.pop(context);
+
+                                    showDialog(
+                                      context: context,
+                                      builder:
+                                          (context) => AlertDialog(
+                                            title: const Text('Error'),
+                                            content: const Text(
+                                              'Could load page',
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('OK'),
+                                              ),
+                                            ],
+                                          ),
+                                    );
+                                  });
+                            })
+                            .catchError((error) {
+                              Navigator.pop(context);
+
+                              showDialog(
+                                context: context,
+                                builder:
+                                    (context) => AlertDialog(
+                                      title: const Text('Error'),
+                                      content: const Text('Could load page'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('OK'),
+                                        ),
+                                      ],
+                                    ),
+                              );
+                            });
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(0),
