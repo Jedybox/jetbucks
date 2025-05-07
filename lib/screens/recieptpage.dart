@@ -8,8 +8,15 @@ import 'package:provider/provider.dart';
 class RecieptPage extends StatelessWidget {
   final GlobalKey globalKey = GlobalKey();
   final Map<String, dynamic> transaction;
+  final String recipientName;
+  final String senderName;
 
-  RecieptPage({super.key, required this.transaction});
+  RecieptPage({
+    super.key,
+    required this.transaction,
+    this.recipientName = "",
+    this.senderName = "",
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -148,10 +155,9 @@ class RecieptPage extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          transaction['receiver'] ==
-                                  context.read<UserProvider>().userId
-                              ? 'You'
-                              : transaction['receiver'].toString(),
+                          recipientName.isNotEmpty
+                              ? recipientName
+                              : transaction['recipient'].toString(),
                           style: GoogleFonts.rubik(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -174,9 +180,8 @@ class RecieptPage extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          transaction['sender'] ==
-                                  context.read<UserProvider>().userId
-                              ? 'You'
+                          senderName.isNotEmpty
+                              ? senderName
                               : transaction['sender'].toString(),
                           style: GoogleFonts.rubik(
                             fontSize: 16,

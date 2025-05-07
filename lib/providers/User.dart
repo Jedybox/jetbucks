@@ -104,7 +104,7 @@ class UserProvider with ChangeNotifier {
   Future<void> cashIn(double amount) async {
     Dio dio = Dio();
     final response = await dio.post(
-      'https://jcash.onrender.com/api/v1/transactions/cashIn',
+      'https://jcash.onrender.com/api/v1/transactions/cash-in',
       data: {
         'transaction_type': 'CASH-IN',
         'amount': amount,
@@ -127,11 +127,11 @@ class UserProvider with ChangeNotifier {
   Future<void> cashOut(double amount) async {
     Dio dio = Dio();
     final response = await dio.post(
-      'https://jcash.onrender.com/api/v1/transactions/cashOut',
+      'https://jcash.onrender.com/api/v1/transactions/cash-out',
       data: {
         'transaction_type': 'CASH-OUT',
         'amount': amount,
-        "receiver": _userId,
+        "sender": _userId,
       },
     );
 
@@ -147,8 +147,9 @@ class UserProvider with ChangeNotifier {
     throw Exception('Failed to cash out');
   }
 
-  Future<void> sendMoney(double amount, String receiverId) async {
+  Future<void> sendMoney(double amount, int receiverId) async {
     Dio dio = Dio();
+
     final response = await dio.post(
       'https://jcash.onrender.com/api/v1/transactions/send-money',
       data: {

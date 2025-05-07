@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:jetbucks/providers/User.dart';
 import 'package:jetbucks/dialogs/loadingdialog.dart';
+import 'package:jetbucks/screens/recieptpage.dart';
 import 'package:dio/dio.dart';
 
 class TransactionPage extends StatefulWidget {
@@ -18,6 +19,7 @@ class _TransactionPageState extends State<TransactionPage> {
   final TextEditingController usernameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final String type;
+  int receiverId = 0;
 
   String amount = '0.00';
 
@@ -49,20 +51,22 @@ class _TransactionPageState extends State<TransactionPage> {
     );
 
     if (response.statusCode == 200) {
-      return;
+      receiverId = response.data;
     }
 
-    throw Exception('User not found');
+    if (response.statusCode == 404) {
+      throw Exception('User not found');
+    }
   }
 
   // TODO: TEST THIS FUNCTION
   void sendForm() {
     if (type == 'SEND' && !_formKey.currentState!.validate()) return;
 
-    final userProvider = Provider.of<UserProvider>(context, listen: true);
-    final double parsedAmount = double.parse(amount.replaceAll('.', ''));
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final double parsedAmount = double.parse(amount);
 
-    if (parsedAmount == 0.00) {
+    if (parsedAmount <= 0.00) {
       showDialog(
         context: context,
         builder:
@@ -77,21 +81,37 @@ class _TransactionPageState extends State<TransactionPage> {
     );
 
     if (type == 'SEND') {
-      userExists(usernameController.text).catchError((_) {
-        Navigator.of(context).pop(); // Close the loading dialog
-        showDialog(
-          context: context,
-          builder:
-              (_) => dialog('User Not Found', 'Please enter a valid username.'),
-        );
-        return;
-      });
-
-      userProvider
-          .sendMoney(parsedAmount, usernameController.text)
+      userExists(usernameController.text)
           .then((_) {
-            Navigator.of(context).pop(); // Close the loading dialog
-            // TODO: pop and push to reciept page
+            Navigator.of(context).pop();
+            if (receiverId == userProvider.userId) {
+              Navigator.of(context).pop(); // Close the loading dialog
+              showDialog(
+                context: context,
+                builder:
+                    (_) => dialog(
+                      'Invalid User',
+                      'You cannot send money to yourself.',
+                    ),
+              );
+              return;
+            }
+
+            userProvider
+                .sendMoney(parsedAmount, receiverId)
+                .then((_) {
+                  Navigator.of(context).pop(); // Go back to the previous page
+                })
+                .catchError((_) {
+                  showDialog(
+                    context: context,
+                    builder:
+                        (_) => dialog(
+                          'Transaction Failed',
+                          'Please check your internet connection and try again.',
+                        ),
+                  );
+                });
           })
           .catchError((_) {
             Navigator.of(context).pop(); // Close the loading dialog
@@ -99,19 +119,19 @@ class _TransactionPageState extends State<TransactionPage> {
               context: context,
               builder:
                   (_) => dialog(
-                    'Transaction Failed',
-                    'Please check your internet connection and try again.',
+                    'User Not Found',
+                    'Please enter your receiver\'s username.',
                   ),
             );
           });
+      return;
     }
 
     if (type == 'CASH-IN') {
       userProvider
           .cashIn(parsedAmount)
           .then((_) {
-            Navigator.of(context).pop(); // Close the loading dialog
-            // TODO: pop and push to reciept page
+            Navigator.of(context).pop();
           })
           .catchError((_) {
             Navigator.of(context).pop(); // Close the loading dialog
@@ -124,14 +144,14 @@ class _TransactionPageState extends State<TransactionPage> {
                   ),
             );
           });
+      return;
     }
 
     if (type == 'CASH-OUT') {
       userProvider
           .cashOut(parsedAmount)
           .then((_) {
-            Navigator.of(context).pop(); // Close the loading dialog
-            // TODO: pop and push to reciept page
+            Navigator.of(context).pop();
           })
           .catchError((_) {
             Navigator.of(context).pop(); // Close the loading dialog
@@ -144,6 +164,7 @@ class _TransactionPageState extends State<TransactionPage> {
                   ),
             );
           });
+      return;
     }
   }
 
