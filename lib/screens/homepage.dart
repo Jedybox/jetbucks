@@ -78,35 +78,84 @@ class _HomePageState extends State<HomePage>
         ],
       ),
       bottomNavigationBar: Container(
-        color: Colors.transparent,
-        padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
-        child: Container(
-          height: 70,
-          decoration: BoxDecoration(
-            color: Color.fromARGB(255, 69, 25, 125),
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Container(
-            height: 60,
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 47, 17, 85),
-              borderRadius: BorderRadius.circular(50),
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.10),
+              blurRadius: 24,
+              offset: Offset(0, 8),
             ),
-            child: TabBar(
-              controller: _tabController,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.transparent,
-              indicatorColor: Colors.white,
-              tabs: [
-                Image.asset("assets/logos/wallet.png", width: 25, height: 25),
-                Image.asset("assets/logos/status.png", width: 25, height: 25),
-                Image.asset(
-                  "assets/logos/notification.png",
-                  width: 25,
-                  height: 25,
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(32),
+          child: BottomAppBar(
+            color: Color(0xFF2F1155),
+            elevation: 0,
+            child: SizedBox(
+              height: 70,
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  color: Color(0xFF6C3DD1),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFF6C3DD1).withOpacity(0.25),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
                 ),
-                Image.asset("assets/logos/account.png", width: 25, height: 25),
-              ],
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white.withOpacity(0.6),
+                labelStyle: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  letterSpacing: 0.5,
+                ),
+                tabs: [
+                  Tab(
+                    icon: Image.asset(
+                      "assets/logos/wallet.png",
+                      width: 28,
+                      height: 28,
+                      color: null,
+                    ),
+                    text: "Wallet",
+                  ),
+                  Tab(
+                    icon: Image.asset(
+                      "assets/logos/status.png",
+                      width: 28,
+                      height: 28,
+                      color: null,
+                    ),
+                    text: "Status",
+                  ),
+                  Tab(
+                    icon: Image.asset(
+                      "assets/logos/notification.png",
+                      width: 28,
+                      height: 28,
+                      color: null,
+                    ),
+                    text: "Alerts",
+                  ),
+                  Tab(
+                    icon: Image.asset(
+                      "assets/logos/account.png",
+                      width: 28,
+                      height: 28,
+                      color: null,
+                    ),
+                    text: "Account",
+                  ),
+                ],
+              ),
             ),
           ),
         ),

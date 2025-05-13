@@ -59,7 +59,6 @@ class _TransactionPageState extends State<TransactionPage> {
     }
   }
 
-  // TODO: TEST THIS FUNCTION
   Future<void> sendForm() async {
     if (type == 'SEND' && !_formKey.currentState!.validate()) return;
 

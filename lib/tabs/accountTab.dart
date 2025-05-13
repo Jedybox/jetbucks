@@ -6,119 +6,120 @@ import 'package:provider/provider.dart';
 import 'package:jetbucks/providers/User.dart';
 
 Padding accountTab({required BuildContext context, required double balance}) {
+  final username = localStorage.getItem('username') ?? 'User';
+
   return Padding(
-    padding: const EdgeInsets.fromLTRB(30, 50, 30, 0),
+    padding: const EdgeInsets.fromLTRB(24, 48, 24, 0),
     child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        Container(
-          clipBehavior: Clip.none,
-          width: double.infinity,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Card(
+          elevation: 6,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          color: Color(0xFFF8F6FC),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  backgroundImage: AssetImage('assets/logos/profile.png'),
+                  radius: 36,
+                  backgroundColor: Colors.white,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  username,
+                  style: GoogleFonts.rubik(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF2F1155),
+                  ),
+                ),
+                SizedBox(height: 32),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFEDE7F6),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Balance",
+                        style: GoogleFonts.quicksand(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF6D6D6D),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "₱",
+                            style: GoogleFonts.quicksand(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF6D6D6D),
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            context
+                                .watch<UserProvider>()
+                                .balance
+                                .toStringAsFixed(2),
+                            style: GoogleFonts.quicksand(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF6D6D6D),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 40),
+        Center(
           child: Column(
             children: [
-              Center(
-                child: Column(
-                  children: [
-                    Image.asset(
-                      'assets/logos/profile.png',
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      localStorage.getItem('username') ?? 'User',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontFamily: 'Rubik',
-                        fontWeight: FontWeight.w600,
-                        color: Color.fromARGB(255, 47, 17, 85),
-                      ),
-                    ),
-                  ],
+              OutlinedButton.icon(
+                onPressed: () {
+                  localStorage.setItem('username', '');
+                  localStorage.setItem('password', '');
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+                icon: Icon(
+                  Icons.logout_outlined,
+                  color: Color(0xFFC76767),
+                  size: 28,
                 ),
-              ),
-              SizedBox(height: 50),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Balance",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontFamily: GoogleFonts.quicksand().fontFamily,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[600],
-                    ),
+                label: Text(
+                  "Logout",
+                  style: GoogleFonts.quicksand(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFC76767),
                   ),
-                  Text.rich(
-                    TextSpan(
-                      text: "₱",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontFamily: GoogleFonts.quicksand().fontFamily,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[600],
-                      ),
-                      children: [
-                        TextSpan(
-                          text: context
-                              .watch<UserProvider>()
-                              .balance
-                              .toStringAsFixed(2),
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontFamily: GoogleFonts.quicksand().fontFamily,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Color(0xFFC76767), width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
                   ),
-                ],
+                  backgroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
+                ),
               ),
             ],
           ),
-        ),
-        Column(
-          children: [
-            OutlinedButton(
-              onPressed: () {
-                // Handle button press
-                localStorage.setItem('username', '');
-                localStorage.setItem('password', '');
-
-                Navigator.pushReplacementNamed(context, '/login');
-              },
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(
-                  color: Color.fromARGB(255, 199, 103, 103),
-                  width: 2,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                backgroundColor: Colors.white,
-
-                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-              ),
-              child: Icon(
-                Icons.logout_outlined,
-                color: Color.fromARGB(255, 199, 103, 103),
-                size: 30,
-              ),
-            ),
-            Text(
-              "Logout",
-              style: TextStyle(
-                fontSize: 20,
-                fontFamily: GoogleFonts.quicksand().fontFamily,
-                fontWeight: FontWeight.w600,
-                color: Color.fromARGB(255, 199, 103, 103),
-              ),
-            ),
-          ],
         ),
       ],
     ),
